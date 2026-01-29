@@ -1,0 +1,50 @@
+# 核心AI框架 (Python 3.10最新兼容版)
+torch==2.2.2
+torchvision==0.17.2
+torchaudio==2.2.2
+
+# 模型处理 (最新稳定版)
+transformers==4.44.2
+accelerate==1.1.0
+sentencepiece==0.2.0
+einops==0.8.0
+tokenizers==0.19.1
+
+# Qwen-VL-Chat必需依赖 (最新版)
+transformers_stream_generator==0.0.5
+tiktoken==0.7.0
+qwen_vl_utils==0.0.1
+
+# 4-bit量化支持 (最新兼容版)
+auto-gptq==0.7.1
+optimum==1.21.0
+bitsandbytes==0.44.1
+
+# Web界面 (最新版)
+gradio==4.44.1
+gradio-client==1.4.0
+fastapi==0.115.0
+uvicorn==0.32.0
+
+# 图像处理 (最新稳定版)
+Pillow==10.4.0
+opencv-python-headless==4.10.0.84
+imageio==2.35.0
+
+# 系统工具 (最新版)
+psutil==6.0.0
+tqdm==4.67.0
+huggingface_hub==0.25.2
+hf_transfer==0.1.8
+requests==2.32.3
+pyyaml==6.0.2
+jsonlines==4.0.0
+packaging==24.1
+pydantic==2.9.2
+
+# 中文支持 (稳定版)
+zhconv==1.4.4
+jieba==0.42.1
+
+# 兼容性核心 (Python 3.10关键依赖)
+numpy==1.26.4
