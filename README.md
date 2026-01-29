@@ -1,14 +1,16 @@
-# 🖼️ 通义千问离线图片中文打标工具
-> **100%离线运行 · 隐私安全 · 专业级中文描述**
+# XXG通义千问离线图片中文打标工具-离线版(QWEN-VL-CHAT)
+> **本地模型 · 100%离线运行 · 隐私安全 · 专业级中文描述**
 >
+![](https://img.shields.io/badge/Python-10.0-blue.svg?style=flat#crop=0&crop=0&crop=1&crop=1&id=ebVxY&originHeight=20&originWidth=86&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title=#crop=0&crop=0&crop=1&crop=1&id=jYpxH&originHeight=20&originWidth=86&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title=#crop=0&crop=0&crop=1&crop=1&id=OveOV&originHeight=20&originWidth=86&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title=)
+![](https://img.shields.io/badge/Pytorch-2.2.2-brightgreen.svg?style=flat#crop=0&crop=0&crop=1&crop=1&id=ebVxY&originHeight=20&originWidth=86&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title=#crop=0&crop=0&crop=1&crop=1&id=jYpxH&originHeight=20&originWidth=86&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title=#crop=0&crop=0&crop=1&crop=1&id=OveOV&originHeight=20&originWidth=86&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title=) ![](https://img.shields.io/badge/Torchvision-0.17.2-brightgreen.svg?style=flat#crop=0&crop=0&crop=1&crop=1&id=ebVxY&originHeight=20&originWidth=86&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title=#crop=0&crop=0&crop=1&crop=1&id=jYpxH&originHeight=20&originWidth=86&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title=#crop=0&crop=0&crop=1&crop=1&id=OveOV&originHeight=20&originWidth=86&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title=) ![](https://img.shields.io/badge/Torchaudio-2.2.2-brightgreen.svg?style=flat#crop=0&crop=0&crop=1&crop=1&id=ebVxY&originHeight=20&originWidth=86&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title=#crop=0&crop=0&crop=1&crop=1&id=jYpxH&originHeight=20&originWidth=86&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title=#crop=0&crop=0&crop=1&crop=1&id=OveOV&originHeight=20&originWidth=86&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title=)
 
 <!-- 这是一张图片 -->
 ![](https://dashscope.oss-cn-beijing.aliyuncs.com/images/qwen-offline-ui.png)
 
 ## 🌟 核心特性
 + **完全离线**: 无网络请求，数据永不离开您的设备
-+ **专业中文描述**: 详细场景分析，包含物体、环境、颜色、动作等
-+ **隐私保护**: 适合处理敏感/私人图片
++ **专业中文描述**: 详细场景分析，包含人物、物体、环境、颜色、动作、文字、排版等
++ **隐私保护**: 适合处理敏感/私人/商业化图片
 + **智能资源管理**: 4-bit量化支持，低显存需求
 + **用户友好**: 简洁Web界面，实时进度显示
 
@@ -17,8 +19,8 @@
 + **操作系统**: Windows 10/11, macOS 12+, Linux
 + **CPU**: 4核以上
 + **内存**: 8GB RAM
-+ **磁盘空间**: 10GB+ 空闲
-+ **Python**: 3.8+
++ **磁盘空间**: 20GB+ 空闲
++ **Python**: 3.10
 
 ### 推荐配置
 + **GPU**: NVIDIA GPU (8GB+显存)
@@ -27,7 +29,7 @@
 
 ### 技术规格
 + **基础模型**: Qwen-VL-Chat (通义千问视觉语言模型)
-+ **中文打标质量**: 专业级描述，包含物体、场景、颜色、动作等细节
++ **中文打标质量**: 专业级描述，包含人物、物体、环境、颜色、动作、文字、排版等细节
 + **资源需求**:
   + 磁盘空间: 20GB+ (模型18GB + 缓存)
   + GPU: NVIDIA GPU 6GB+显存 (推荐8GB+)
@@ -38,13 +40,11 @@
 
 ###  选择适合您的启动脚本:
 + **Linux/Mac用户**:
-  + 非Conda: chmod +x run.sh && ./run.sh
-  + Conda: chmod +x run-conda.sh && ./run-conda.sh
+  + chmod +x run.sh && ./run.sh
 + **Windows用户**:
-  + 非Conda: run.bat
-  + Conda: run-conda.bat
+  + run.bat
 ###  首次运行:
-  + 脚本会自动创建环境、安装依赖
+  + 脚本会自动创建环境、安装依赖（失败后请根据提示使用pip install安装）
   + 提示下载Qwen-VL-Chat模型（约18GB）
   + 模型下载完成后完全离线运行
 
@@ -52,15 +52,13 @@
 ```bash
 python download_models.py
 ```
-
-### 中国用户加速下载
+### 网络很差的请使用单线程下载
+```bash
+python download_models_sg.py
+```
+### 中国用户加速下载(对比原始速度自行决定)
 ```bash
 python download_models.py --mirror
-```
-
-### 自定义保存目录
-```bash
-python download_models.py --dir ./models/qwen-vl
 ```
 
 ### 增加重试次数（网络不稳定时）
@@ -74,8 +72,6 @@ python download_models.py --retry 5
 git clone https://github.com/moskoo/qwen-caption.git
 cd qwen-caption
 ```
-
-
 
 ### <font style="color:rgb(29, 29, 31);">2. 下载模型 (需要网络)</font>
 ```bash
@@ -96,7 +92,7 @@ run.bat
 ```
 
 ### <font style="color:rgb(29, 29, 31);">4. 使用Web界面</font>
-1. <font style="color:rgb(29, 29, 31);">访问 </font>`<font style="color:rgb(97, 92, 237);">http://127.0.0.1:9527</font>`
+1. <font style="color:rgb(29, 29, 31);">访问 </font><font style="color:rgb(97, 92, 237);">`http://127.0.0.1:9527`</font>
 2. <font style="color:rgb(29, 29, 31);">输入图片文件夹路径</font>
 3. <font style="color:rgb(29, 29, 31);">选择运行模式 (4-bit量化/CPU模式)</font>
 4. <font style="color:rgb(29, 29, 31);">点击"</font><font style="color:rgb(29, 29, 31);">🚀</font><font style="color:rgb(29, 29, 31);"> 开始中文打标"</font>
@@ -118,22 +114,17 @@ python app.py --cpu
 python app.py --port 7860
 ```
 
-### <font style="color:rgb(29, 29, 31);">中国用户加速下载</font>
-```bash
-python download_models.py --mirror
-```
-
 ## <font style="color:rgb(29, 29, 31);">📦</font><font style="color:rgb(29, 29, 31);"> 项目结构</font>
 ```bash
 qwen-caption/
 ├── app.py                     # 主应用程序
+├── qwen_models/               # qwen-vl-chat模型存放文件夹
 ├── requirements.txt           # 依赖文件
-├── run.sh                     # 非Conda版启动脚本 (Linux/Mac)
-├── run.bat                    # 非Conda版启动脚本 (Windows)
-├── run-conda.sh               # Conda版启动脚本 (Linux/Mac)
-├── run-conda.bat              # Conda版启动脚本 (Windows)
+├── run.sh                     # 启动脚本 (Linux/Mac)
+├── run.bat                    # 启动脚本 (Windows)
 ├── download_models.py         # 模型下载脚本
-├── fix_dependencies.py        # 依赖修复工具
+├── download_models_sg.py      # 模型下载单线程脚本
+├── fix_dependencies.py        # 依赖修复工具(迁移使用)
 └── README.md                  # 使用指南
 ```
 
@@ -159,9 +150,9 @@ qwen-caption/
 <font style="color:rgb(29, 29, 31);">A:</font>
 
 1. <font style="color:rgb(29, 29, 31);">在一台机器上完成下载和验证</font>
-2. <font style="color:rgb(29, 29, 31);">复制整个项目目录 (包含 </font>`<font style="color:rgb(97, 92, 237);">qwen_models</font>`<font style="color:rgb(29, 29, 31);"> 文件夹)</font>
-3. <font style="color:rgb(29, 29, 31);">在目标机器上运行 </font>`<font style="color:rgb(97, 92, 237);">fix_dependencies.py</font>`
-4. <font style="color:rgb(29, 29, 31);">使用 </font>`<font style="color:rgb(97, 92, 237);">run.sh</font>`<font style="color:rgb(29, 29, 31);">/</font>`<font style="color:rgb(97, 92, 237);">run.bat</font>`<font style="color:rgb(29, 29, 31);"> 启动</font>
+2. <font style="color:rgb(29, 29, 31);">复制整个项目目录 (包含 </font><font style="color:rgb(97, 92, 237);">`qwen_models`</font><font style="color:rgb(29, 29, 31);"> 文件夹)</font>
+3. <font style="color:rgb(29, 29, 31);">在目标机器上运行 </font><font style="color:rgb(97, 92, 237);">`fix_dependencies.py`</font>
+4. <font style="color:rgb(29, 29, 31);">使用 </font><font style="color:rgb(97, 92, 237);">`./run.sh`</font><font style="color:rgb(29, 29, 31);"></font><font style="color:rgb(97, 92, 237);">`run.bat`</font><font style="color:rgb(29, 29, 31);"> 启动</font>
 
 ### <font style="color:rgb(29, 29, 31);">Q: 模型文件太大怎么办?</font>
 <font style="color:rgb(29, 29, 31);">A:</font>
@@ -170,15 +161,13 @@ qwen-caption/
 + <font style="color:rgb(29, 29, 31);">仅保留必要文件 (删除示例、文档等)</font>
 + <font style="color:rgb(29, 29, 31);">使用外部硬盘存储模型</font>
 
-
-
 ## 🚀 不使用一键脚本使用指南
 
 ### 1. **首次设置 (需要网络)**
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/yourusername/qwen-captioner.git
-cd qwen-captioner
+git clone https://github.com/moskoo/qwen-caption.git
+cd qwen-caption
 
 # 2. 安装依赖
 python -m venv .venv
@@ -189,19 +178,14 @@ pip install -r requirements.txt
 
 # 3. 下载模型 (约5GB)
 python download_models.py --mirror  # 中国用户加--mirror参数
+
+# 4. 运行主程序
+python app.py
 ```
 
-### <font style="color:rgb(29, 29, 31);">2. </font>**<font style="color:rgb(29, 29, 31);">运行应用 (完全离线)</font>**
-```bash
-# Linux/Mac
-chmod +x run.sh
-./run.sh
 
-# Windows
-run.bat
-```
 
-### <font style="color:rgb(29, 29, 31);">3. </font>**<font style="color:rgb(29, 29, 31);">离线部署到其他机器</font>**
+### <font style="color:rgb(29, 29, 31);">2. </font>**<font style="color:rgb(29, 29, 31);">离线迁移到其他机器</font>**
 ```bash
 # 1. 在已配置好的机器上打包
 zip -r qwen-caption.zip qwen-caption/
@@ -214,11 +198,7 @@ python fix_dependencies.py --force
 ./run.sh  # 或 run.bat
 ```
 
-**<font style="color:rgb(140, 141, 155);">重要提示</font>**<font style="color:rgb(140, 141, 155);">: 首次下载完成后，所有操作完全离线进行。模型文件约18GB，确保有足够磁盘空间。对于企业级部署，建议联系阿里云获取商业支持。</font>
-
-
-
-
+**<font style="color:rgb(140, 141, 155);">重要提示</font>**<font style="color:rgb(140, 141, 155);">: 首次下载完成后，所有操作完全离线进行。模型文件约18GB，确保有足够磁盘空间。有任何疑问可以联系小瓜。</font>
 
 
 ## <font style="color:rgb(29, 29, 31);">📜</font><font style="color:rgb(29, 29, 31);"> 许可证</font>
@@ -233,4 +213,4 @@ python fix_dependencies.py --force
 
 ---
 
-**<font style="color:rgb(29, 29, 31);">©</font>****<font style="color:rgb(29, 29, 31);"> 2026 通义千问离线图片打标工具 | 完全离线 · 隐私安全 · 开源免费</font>**
+**<font style="color:rgb(29, 29, 31);">©</font>XXG<font style="color:rgb(29, 29, 31);"> 2026 通义千问离线图片打标工具 | 完全离线 · 隐私安全 · 开源免费</font>**
