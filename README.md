@@ -170,22 +170,9 @@ qwen-caption/
 + <font style="color:rgb(29, 29, 31);">仅保留必要文件 (删除示例、文档等)</font>
 + <font style="color:rgb(29, 29, 31);">使用外部硬盘存储模型</font>
 
-## <font style="color:rgb(29, 29, 31);">📜</font><font style="color:rgb(29, 29, 31);"> 许可证</font>
-<font style="color:rgb(29, 29, 31);">本项目使用 </font>[<font style="color:rgb(97, 92, 237);">Apache 2.0 License</font>](https://chat.qwen.ai/c/LICENSE)<font style="color:rgb(29, 29, 31);">，基于通义实验室开源的Qwen-VL-Chat模型。</font>
 
-**<font style="color:rgb(140, 141, 155);">注意</font>**<font style="color:rgb(140, 141, 155);">: 本工具仅用于个人学习和研究目的。商业使用请遵守Qwen模型的许可协议。</font>
 
-## <font style="color:rgb(29, 29, 31);">🙏</font><font style="color:rgb(29, 29, 31);"> 致谢</font>
-+ [<font style="color:rgb(97, 92, 237);">通义实验室</font>](https://www.aliyun.com/product/tongyi)<font style="color:rgb(29, 29, 31);"> - Qwen-VL-Chat模型</font>
-+ [<font style="color:rgb(97, 92, 237);">Hugging Face</font>](https://huggingface.co/)<font style="color:rgb(29, 29, 31);"> - 模型托管平台</font>
-+ [<font style="color:rgb(97, 92, 237);">Gradio</font>](https://www.gradio.app/)<font style="color:rgb(29, 29, 31);"> - Web界面框架</font>
-
----
-
-**<font style="color:rgb(29, 29, 31);">©</font>****<font style="color:rgb(29, 29, 31);"> 2026 通义千问离线图片打标工具 | 完全离线 · 隐私安全 · 开源免费</font>**
-
-```bash
-## 🚀 安装与使用指南
+## 🚀 不使用一键脚本使用指南
 
 ### 1. **首次设置 (需要网络)**
 ```bash
@@ -227,7 +214,23 @@ python fix_dependencies.py --force
 ./run.sh  # 或 run.bat
 ```
 
-**<font style="color:rgb(140, 141, 155);">重要提示</font>**<font style="color:rgb(140, 141, 155);">: 首次下载完成后，所有操作完全离线进行。模型文件约5GB，确保有足够磁盘空间。对于企业级部署，建议联系阿里云获取商业支持。</font>
+**<font style="color:rgb(140, 141, 155);">重要提示</font>**<font style="color:rgb(140, 141, 155);">: 首次下载完成后，所有操作完全离线进行。模型文件约18GB，确保有足够磁盘空间。对于企业级部署，建议联系阿里云获取商业支持。</font>
 
 
 
+
+
+
+## <font style="color:rgb(29, 29, 31);">📜</font><font style="color:rgb(29, 29, 31);"> 许可证</font>
+<font style="color:rgb(29, 29, 31);">本项目使用 </font>[<font style="color:rgb(97, 92, 237);">Apache 2.0 License</font>](https://chat.qwen.ai/c/LICENSE)<font style="color:rgb(29, 29, 31);">，基于通义实验室开源的Qwen-VL-Chat模型。</font>
+
+**<font style="color:rgb(140, 141, 155);">注意</font>**<font style="color:rgb(140, 141, 155);">: 本工具仅用于个人学习和研究目的。商业使用请遵守Qwen模型的许可协议。</font>
+
+## <font style="color:rgb(29, 29, 31);">🙏</font><font style="color:rgb(29, 29, 31);"> 致谢</font>
++ [<font style="color:rgb(97, 92, 237);">通义实验室</font>](https://www.aliyun.com/product/tongyi)<font style="color:rgb(29, 29, 31);"> - Qwen-VL-Chat模型</font>
++ [<font style="color:rgb(97, 92, 237);">Hugging Face</font>](https://huggingface.co/)<font style="color:rgb(29, 29, 31);"> - 模型托管平台</font>
++ [<font style="color:rgb(97, 92, 237);">Gradio</font>](https://www.gradio.app/)<font style="color:rgb(29, 29, 31);"> - Web界面框架</font>
+
+---
+
+**<font style="color:rgb(29, 29, 31);">©</font>****<font style="color:rgb(29, 29, 31);"> 2026 通义千问离线图片打标工具 | 完全离线 · 隐私安全 · 开源免费</font>**

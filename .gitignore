@@ -1,3 +1,4 @@
 *.log
 .venv/
 .env_installed
+qwen_models/*.*
