@@ -3,7 +3,8 @@ setlocal enabledelayedexpansion
 
 echo 🚀 通义千问离线图片打标工具启动脚本 (Python 3.10 + PyTorch 2.10.0)
 echo ✅ 专为Python 3.10环境优化
-echo ✅ 使用PyTorch 2.2.2稳定版
+echo ✅ 使用PyTorch 2.10.0最新稳定版
+echo ✅ 修复transformers_stream_generator依赖识别问题
 echo ✅ 适配Qwen-VL-Chat文件结构
 echo ==============================================
 

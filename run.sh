@@ -1,8 +1,9 @@
 #!/bin/bash
 
-echo "🚀 XXG通义千问离线图片打标工具启动脚本"
+echo "🚀 通义千问离线图片打标工具启动脚本 (Python 3.10 + PyTorch 2.9.1)"
 echo "✅ 专为Python 3.10环境优化"
-echo "✅ 使用PyTorch 2.2.2稳定版"
+echo "✅ 使用Torch 2.2.2最新稳定版"
+echo "✅ 修复transformers_stream_generator依赖识别问题"
 echo "✅ 适配Qwen-VL-Chat文件结构"
 echo "=============================================="
 
@@ -20,37 +21,139 @@ if ! command -v python3.10 &> /dev/null; then
     echo "   Ubuntu/Debian: sudo apt update && sudo apt install python3.10 python3.10-venv"
     echo "   CentOS/RHEL: sudo yum install python3.10 python3.10-venv"
     echo "   macOS: brew install python@3.10"
+    echo "【1/4】检查并安装python3.10-venv依赖..."
+    if ! dpkg -s python3.10-venv &> /dev/null; then
+        echo "未安装python3.10-venv，开始安装..."
+        sudo apt update && sudo apt install -y python3.10-venv python3.10-dev
+    else
+        echo "python3.10-venv已安装"
+    fi
     exit 1
 fi
 
-# 检查GPU和CUDA
+# 检查GPU和CUDA (增强版)
 check_gpu_requirements() {
     local has_gpu=false
     local cuda_available=false
     local cuda_version=""
-
+    local gpu_details=""
+    
+    echo "🔍 检测GPU和CUDA状态..."
+    
+    # 1. 首先检查是否有NVIDIA GPU
     if command -v nvidia-smi &> /dev/null; then
-        has_gpu=true
-        if command -v nvcc &> /dev/null; then
-            cuda_version=$(nvcc --version 2>/dev/null | grep release | sed 's/.*release //' | sed 's/,.*//')
-            cuda_available=true
+        # 获取GPU详细信息
+        gpu_details=$(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader 2>/dev/null || echo "")
+        
+        if [ -n "$gpu_details" ]; then
+            has_gpu=true
+            echo "🎮 检测到NVIDIA GPU:"
+            echo "   $gpu_details"
         else
-            # 尝试从nvidia-smi获取CUDA版本
-            cuda_version=$(nvidia-smi 2>/dev/null | grep "CUDA Version" | awk '{print $9}')
-            cuda_available=true
+            echo "⚠️  nvidia-smi存在但未检测到GPU，可能驱动问题"
         fi
-        echo "🎮 检测到NVIDIA GPU"
-        if [ -n "$cuda_version" ]; then
-            echo "🔢 CUDA版本: $cuda_version"
+    else
+        echo "🔍 未找到nvidia-smi命令，尝试其他检测方法..."
+        
+        # 备用方法1: 检查/proc/driver/nvidia
+        if [ -d "/proc/driver/nvidia" ]; then
+            echo "🎮 通过/proc/driver/nvidia检测到NVIDIA GPU"
+            has_gpu=true
+        fi
+        
+        # 备用方法2: 检查lspci
+        if command -v lspci &> /dev/null; then
+            if lspci 2>/dev/null | grep -i nvidia &> /dev/null; then
+                echo "🎮 通过lspci检测到NVIDIA GPU"
+                has_gpu=true
+            fi
+        fi
+        
+        # 备用方法3: 检查设备文件
+        if [ -c "/dev/nvidia0" ] || [ -c "/dev/nvidiactl" ]; then
+            echo "🎮 通过设备文件检测到NVIDIA GPU"
+            has_gpu=true
+        fi
+    fi
+    
+    # 2. 检查CUDA可用性
+    if $has_gpu; then
+        echo "🔍 检查CUDA工具包..."
+        
+        # 检查CUDA运行时API
+        if python3.10 -c "
+import importlib.util, sys, subprocess, json, os, math, random, time, datetime, collections, itertools, fractions, decimal, typing, statistics, heapq, bisect, copy, string, re, collections, math
+try:
+    import torch
+    if torch.cuda.is_available():
+        print('CUDA_AVAILABLE: true')
+        print(f'GPU_COUNT: {torch.cuda.device_count()}')
+        print(f'CURRENT_DEVICE: {torch.cuda.current_device()}')
+        print(f'GPU_NAME: {torch.cuda.get_device_name(0)}')
+        print(f'GPU_MEMORY: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f}GB')
+        print(f'PYTORCH_VERSION: {torch.__version__}')
+    else:
+        print('CUDA_AVAILABLE: false')
+except Exception as e:
+    print(f'ERROR: {str(e)}')
+" 2>/dev/null | grep -q "CUDA_AVAILABLE: true"; then
+            cuda_available=true
+            echo "✅ CUDA在PyTorch中可用"
+            
+            # 获取PyTorch检测到的CUDA版本
+            cuda_version=$(python3.10 -c "import torch; print(torch.version.cuda)" 2>/dev/null || echo "")
+            if [ -n "$cuda_version" ]; then
+                echo "🔢 PyTorch使用的CUDA版本: $cuda_version"
+            fi
         else
-            echo "⚠️  未检测到CUDA工具包，将使用CPU版本PyTorch"
-            cuda_available=false
+            echo "⚠️  GPU存在但CUDA在PyTorch中不可用"
+            echo "💡 可能原因:"
+            echo "   • 未安装正确版本的PyTorch"
+            echo "   • NVIDIA驱动版本过低"
+            echo "   • CUDA工具包未正确配置"
+            
+            # 检查nvcc
+            if command -v nvcc &> /dev/null; then
+                cuda_version=$(nvcc --version 2>/dev/null | grep release | sed 's/.*release //' | sed 's/,.*//')
+                echo "🔢 检测到CUDA工具包版本: $cuda_version"
+            else
+                # 尝试从nvidia-smi获取
+                cuda_version=$(nvidia-smi 2>/dev/null | grep "CUDA Version" | awk '{print $9}' 2>/dev/null || echo "")
+                if [ -n "$cuda_version" ]; then
+                    echo "🔢 从nvidia-smi获取CUDA版本: $cuda_version"
+                else
+                    echo "⚠️  无法确定CUDA版本"
+                fi
+            fi
+            
+            # 检查驱动版本
+            if command -v nvidia-smi &> /dev/null; then
+                driver_version=$(nvidia-smi 2>/dev/null | grep "Driver Version" | awk '{print $6}' 2>/dev/null || echo "")
+                if [ -n "$driver_version" ]; then
+                    echo "🔧 NVIDIA驱动版本: $driver_version"
+                    
+                    # 粗略检查驱动与CUDA兼容性
+                    if [ -n "$cuda_version" ]; then
+                        if [[ "$cuda_version" =~ 12 ]] && [[ "$driver_version" < "525" ]]; then
+                            echo "⚠️  警告: CUDA 12.x需要NVIDIA驱动版本>=525"
+                        elif [[ "$cuda_version" =~ 11.[0-8] ]] && [[ "$driver_version" < "450" ]]; then
+                            echo "⚠️  警告: CUDA 11.x需要NVIDIA驱动版本>=450"
+                        fi
+                    fi
+                fi
+            fi
         fi
     else
         echo "💻 未检测到NVIDIA GPU，将使用CPU版本"
-        cuda_available=false
     fi
-
+    
+    # 3. 最终状态报告
+    echo "📊 GPU检测结果:"
+    echo "   • GPU存在: $has_gpu"
+    echo "   • CUDA可用: $cuda_available"
+    echo "   • CUDA版本: ${cuda_version:-'未知'}"
+    
+    # 4. 返回结果
     echo "$has_gpu:$cuda_available:$cuda_version"
 }
 
@@ -111,6 +214,7 @@ setup_virtual_env() {
 
         # 激活环境
         source "$env_name/bin/activate"
+        echo "✅ 虚拟环境 '$env_name' 已激活!"
 
         # 验证环境
         echo "🛠️  验证当前Python 3.10路径和环境..."
@@ -167,7 +271,7 @@ dependencies = {
     'transformers_stream_generator': '0.0.5',
     'tiktoken': '0.7.0',
     'transformers': '4.44.2',
-    'pytorch': '2.10.0',
+    'torch': '2.2.2',
     'numpy': '1.26.4'
 }
 
@@ -238,7 +342,7 @@ install_dependencies() {
 
     # 安装其他依赖
     echo "⬇️ 安装其他依赖..."
-    pip install "transformers==4.44.2" "gradio==4.44.0" "accelerate==1.1.0" --upgrade --quiet
+    pip install "transformers==4.44.2" "gradio==4.44.1" "accelerate==1.1.0" --upgrade --quiet
     pip install -r requirements.txt --no-cache-dir --upgrade
 
     echo "✅ 依赖安装完成"
@@ -250,7 +354,7 @@ verify_dependencies() {
 import importlib, sys, subprocess, pkgutil, importlib.util, json, os, warnings, math
 warnings.filterwarnings('ignore')
 
-required_packages = ['transformers_stream_generator', 'tiktoken', 'transformers', 'pytorch', 'numpy']
+required_packages = ['transformers_stream_generator', 'tiktoken', 'transformers', 'torch', 'numpy']
 missing = []
 for pkg in required_packages:
     try:
@@ -395,6 +499,5 @@ main() {
     echo ""
     echo "👋 应用已关闭"
 }
-
 # 执行主流程
 main "$@"

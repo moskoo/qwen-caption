@@ -339,7 +339,7 @@ def generate_chinese_caption(image_path, max_new_tokens=200):
         query = tokenizer.from_list_format([
             {'image': image_path},
             {
-                'text': '详细描述这张图片的内容，用中文回答。需要包含：主要物体、场景环境、颜色特征、人物动作（如果有）、整体氛围等关键信息。要求描述专业、准确、流畅。'}
+                'text': '详细描述这张图片的内容，用中文回答。需要包含：主要物体、场景环境、颜色特征、文字内容及字体、图文排版布局、人体结构和比例（如果有）、人物动作（如果有）、整体氛围等关键信息。要求描述专业、准确、流畅。'}
         ])
 
         # 生成描述
@@ -524,7 +524,7 @@ def create_ui():
         gr.Markdown("### 100%离线运行 · 隐私安全 · 专业级中文描述")
 
         with gr.Tabs():
-            with gr.TabItem("🚀 批量图片打标"):
+            with gr.TabItem("🚀 处理图片"):
                 with gr.Row():
                     with gr.Column(scale=3):
                         folder_input = gr.Textbox(

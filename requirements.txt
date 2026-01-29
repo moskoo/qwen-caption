@@ -43,7 +43,7 @@ packaging==24.1
 pydantic==2.9.2
 
 # 中文支持 (稳定版)
-zhconv==1.4.4
+zhconv==1.4.3
 jieba==0.42.1
 
 # 兼容性核心 (Python 3.10关键依赖)
