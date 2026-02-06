@@ -1,0 +1,16 @@
+# ================================
+# transformers 源码编译专用依赖清单
+# ✅ 适配Qwen3-VL官方集成 | ✅ 无special_tokens_map.json依赖
+# ✅ 编译工具链 | ✅ Vision-Language扩展支持
+# ================================
+
+# 编译工具链 (必需系统级cmake/ninja，此处为Python封装)
+wheel>=0.42.0
+setuptools>=69.0.0
+cmake>=3.28.0          # Python cmake封装 (需系统级cmake>=3.18)
+ninja>=1.11.0          # Python ninja封装 (需系统级ninja>=1.10)
+
+# transformers源码安装 (含Qwen3-VL官方支持)
+# 注意: 实际安装需在克隆的源码目录执行: pip install -e ".[vl]"
+# 此处仅作依赖声明，安装逻辑在run.sh中实现
+# git+https://github.com/huggingface/transformers@main#egg=transformers[vl]
