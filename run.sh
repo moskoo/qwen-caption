@@ -137,9 +137,9 @@ if [ "$USE_GPU" -eq 1 ]; then
     echo "💡 CUDA 13.x 与 CUDA 12.4 二进制完全兼容，直接使用cu124 wheel"
     pip install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 --index-url https://download.pytorch.org/whl/cu124 -i https://pypi.tuna.tsinghua.edu.cn/simple 2>/dev/null || {
         echo "⚠️  cu124安装失败，尝试cu121..."
-        pip install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 --index-url https://download.pytorch.org/whl/cu121 2>/dev/null || {
+        pip install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 --index-url https://download.pytorch.org/whl/cu121 -i https://pypi.tuna.tsinghua.edu.cn/simple 2>/dev/null || {
             echo "❌ GPU版本安装失败，回退到CPU版本..."
-            pip install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 --index-url https://download.pytorch.org/whl/cpu 2>/dev/null || {
+            pip install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 --index-url https://download.pytorch.org/whl/cpu -i https://pypi.tuna.tsinghua.edu.cn/simple 2>/dev/null || {
                 echo "❌ PyTorch安装失败"
                 exit 1
             }

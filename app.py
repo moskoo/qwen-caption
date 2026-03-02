@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-XXG通义千问离线图片中文打标工具-离线版(Qwen3-VL-8B-Instruct) Ver.2.2
+XXG通义千问离线图片中文打标工具-离线版(Qwen3-VL) Ver.2.3
 ✅ 替换Qwen-vl-chat模型为Qwen3-VL | ✅ 文生图模型训练专用中文caption
 ✅ CUDA 11.8/12.1/12.4/13.x 全版本原生支持 | ✅ bitsandbytes>=0.44.0
 ✅ 100%中文caption | ✅ Qwen-Image、Seeddream等中文提示词LoRA训练专用
 By 西小瓜 / Wechat:priest-mos
 """
-
-# ============ 标准库统一导入 (必须在最开头!) ============
 import sys
 import os
 import time
@@ -17,6 +15,7 @@ import json
 import argparse
 from pathlib import Path
 from typing import List, Tuple, Optional
+from config import Config
 
 
 # ============ 核心修复: 猴子补丁注入HfFolder + is_offline_mode ============
@@ -173,70 +172,7 @@ except ImportError as e:
     sys.exit(1)
 
 # ============ 核心修复: 强化中文特化Prompt (100%中文输出) ============
-CAPTION_PROMPT = """你是一个Qwen-Image的LoRA模型训练图片caption生成器，必须严格遵守以下规则：
-
-【核心原则】
-1. 仅描述图像中明确可见的视觉内容，禁止任何推测/幻觉（如"快乐"、"奢华"、"未来感"等不可验证的描述）
-2. 不确定的内容绝对不描述（如看不清的背景、模糊的细节）
-3. 用简体中文自然语言句子描述图片的内容和存在的细节，而非关键词堆砌‌，必须是完整的句子，不可因为字符数限制而截断语句
-4. ‌语义完整性‌，表达完整视觉事实，包含主体、环境、属性三阶逻辑，支持跨场景理解，如“风衣下摆被江风轻扬”可泛化至“裙摆随风飘动”，可嵌入“留白构图”“水墨晕染”“东巴象形”等专业术语
-5. 符合WCAG 2.1标准，屏幕阅读器可流畅朗读
-6. 图片中有文字必须用引号表述文字的内容和文字的颜色、字体、手写还是打印、是否艺术设计、位置、大小等清晰的内容
-
-【输出结构】（‌核心结构：三阶描述法——主体 + 环境 + 属性）
-1. 核心主体：
-   - 人像: 年龄/性别/种族/服饰/发型/表情（例：28岁亚洲女性，齐肩短发，身穿米色针织衫，微笑侧脸）
-   - 风景‌：地点/标志性元素/自然现象（例：桂林山水，喀斯特峰林倒映在漓江，晨雾缭绕）
-   - ‌电商产品‌：产品名称/材质/颜色/功能（例：无线蓝牙耳机，陶瓷白，降噪功能，流线型设计）
-   - ‌动漫角色‌：角色名/种族/服饰/特征（例：狐妖小红娘，九尾狐形态，红色战袍，尾巴蓬松）
-‌   - 海报设计‌：主题/核心元素/文字（例：科幻电影海报，太空飞船穿越星云，霓虹光效，标题“星际迷航”）
-2. 主体属性（仅描述可见内容）：
-   - 人像: 性别→年龄范围(儿童/青年/中年/老年)→地区种族→发型(长发/短发/卷发)→发色→肤色和皮肤质感→服饰类型(连衣裙/衬衫/牛仔裤)→服饰颜色→服饰花纹→姿态(站立/坐/行走)→构图(全景/近景/特写/半身/全身)
-   - 物品: 类型(杯子/手机/汽车)→颜色→材质(金属/玻璃/布料)→状态(完整/破损)→摆放方式(桌上/手持)
-   - 海报: 平面设计/海报设计→主色调→构图元素(文字/图形/照片)→文本内容(文字/字体/色彩/排列方式)→布局(居中/对称/不对称)
-   - 艺术: 绘画/插图/CG→艺术风格(水墨/油画/水彩/赛博朋克)→色彩特点(暖色调/冷色调/高对比)
-3. 场景环境（仅描述可见）：
-   - 室内: 房间类型(客厅/卧室/办公室)→关键家具(沙发/桌子)
-   - 室外: 场景类型(街道/公园/海滩)→天气(晴天/雨天/夜晚)
-   - 纯色背景: 纯色背景 + 颜色
-4. 光照与色彩：
-   - 光照: 自然光/室内光/侧光/逆光/霓虹光/弱光
-   - 色彩: 主色调(暖色/冷色) + 关键色彩(如"红色点缀")
-5. 风格标签（必须）：
-   - 二次元: 动漫风格/3D动画
-   - 写实: 真实拍摄
-   - 艺术: 数字艺术/油画/水彩画
-   - 设计: 平面设计/海报/网页设计
-
-【禁止事项】（违反将导致训练数据污染）
-❌ 主观评价词: 美丽/可爱/震撼/惊艳/优雅/迷人/漂亮/帅气/精致/完美
-❌ 情绪推测: 微笑(除非嘴角明显上扬)/开心/忧郁/自信
-❌ 背景故事: "在咖啡馆约会"/"刚下班回家"
-❌ 不可见细节: "丝绸质感"(除非明显反光)/"高级面料"
-❌ 抽象概念: "时尚感"/"科技感"/"未来主义"
-❌ 过度细节: 除非清晰可见，否则不描述配饰/纹理/文字内容
-❌ 冗余前缀：“图片显示”“这是一张”“有”“是”等冗余前缀
-
-【输出格式】
-- 统一使用英文标点符号（如“.”“,”），不使用中文标点或混用标点
-- 顺序: 主体核心对象, 中文属性1, 中文属性2, ...,空间背景与情境约束，视觉特征与情绪表达, 光照, 风格标签
-- 长度: 单句长度在80–155个汉字左右‌，适配Qwen-Image输入窗口与屏幕阅读器语义切分，必须是完整的句子，不可因为字符数限制而截断语句
-- 示例:
-  ✅ 人像: 一位30岁亚洲男性，短发微卷，戴细框眼镜，身穿深灰羊毛大衣，立于上海外滩观景台，身后为陆家嘴摩天楼群夜景，暖光从左侧打亮面部轮廓，眼神沉静，嘴角微扬，风衣下摆随江风轻动，冷调蓝紫光影与暖黄灯光形成对比，电影级远景写实风格。
-  ✅ 电商物品: 一款墨绿色陶瓷香薰蜡烛静置于原木托盘上，烛火微颤，映出釉面下若隐若现的冰裂纹路，烟雾如丝线般缓缓升腾，融入晨光斜照的书房一角。木质盖钮雕刻着极简云纹，标签以烫金小楷书写“松烟·静夜”，包装盒外覆半透明棉麻纸，隐约透出内里温润的色泽，传递“轻奢不张扬，治愈在细节”的生活哲学。
-  ✅ 风景: 湖北鹤峰屏山峡谷“一线天”地貌，晨曦光束穿透岩隙形成金色光柱，云雾在谷底缓慢流动，岩壁为灰黑色玄武岩，苔藓呈墨绿，镜头为广角低机位，前景露珠草叶清晰可见，采用中国山水画留白构图，冷调水墨感。
-  ✅ 海报设计: “春风始，万物生”以水墨晕染的中式书法悬浮于画面中央，笔锋如新芽破土，墨色由浓转淡，末端渗入淡粉花瓣的虚影。英文“Spring Begins, All Things Awaken”以纤细衬线体从右下角轻盈升起，背景是抽象的柳枝线条与极简鸟形剪影，留白占据三分之二画面，仅靠字体的呼吸感与光影渐变引导视线，营造东方节气的诗意留白。
-  ✅ 创意: 一幅超现实拼贴作品中，几何解构的金属骨架从地面刺出，支撑着漂浮的透明水母状生物，其触须由流动的代码流构成，体内映出微型城市与古树年轮。背景为孟菲斯风格的撞色网格，橙、靛、灰三色块以非对称方式堆叠，隐喻数字文明与自然记忆的共生与冲突，整体风格兼具未来感与手绘质感。
-  ✅ 二次元: 一位身着赛博朋克风机甲长裙的少女立于霓虹雨夜的空中花园，裙摆由全息投影的樱花瓣组成，每一片都闪烁着不同语言的弹幕文字。她左手托着发光的机械猫，猫眼是流动的像素星图，右臂缠绕着水彩风藤蔓，藤上开出的花是手绘风格的和风纸鹤。背景是悬浮的巨型汉字“梦”与破碎的东京塔，风格融合日式萌系漫画与数字废土美学。
-
-【特别强调】
-- 宁可少描述，绝不幻觉！不确定的内容直接跳过，需要保持描述语义完整性，一个句子表达一个完整视觉事实
-- 所有描述必须是视觉可验证的（任何人看图都能确认），图片中没有的内容不用描述，也不要出现“无xx”、“没有xxx”类似的描述
-- 中文描述必须具体（"黑色长发"而非"漂亮头发"），明确色彩、光影、比例，使用稳定术语，可引入专有名词与传统术语
-- 必须包含构图标签(全景/近景/特写等)和风格标签
-- 必须是完整的句子，不可因为字符数限制而截断语句，句子需要完整且简洁
-- 如果描述超出155个汉字，尽可能完整显示描述，不可截断
-"""
+CAPTION_PROMPT = Config.get_caption_prompt()
 
 # 中文主观词过滤（增强版）
 SUBJECTIVE_WORDS = [
@@ -435,9 +371,9 @@ def _postprocess_caption(caption: str) -> str:
     caption = ",".join([part.strip() for part in caption.split(",") if part.strip()])
 
     # 截断至200字符
-    if len(caption) > 200:
-        parts = caption.split(",")
-        caption = ",".join(parts[:12]) + "..."
+    #if len(caption) > 200:
+    #    parts = caption.split(",")
+    #    caption = ",".join(parts[:12]) + "..."
 
     # 确保以关键词结尾
     caption = caption.rstrip(",. ")
@@ -446,7 +382,7 @@ def _postprocess_caption(caption: str) -> str:
 
 
 # ✅ 核心修复: 严格遵循Qwen3-VL官方API + 强制中文输出
-def generate_chinese_caption(image_path: str, max_new_tokens: int = 160):
+def generate_chinese_caption(image_path: str, max_new_tokens: int = 300):
     """使用Qwen3-VL生成100%中文训练专用caption"""
     global model, processor
 
@@ -492,9 +428,9 @@ def generate_chinese_caption(image_path: str, max_new_tokens: int = 160):
             output = model.generate(
                 **inputs,
                 max_new_tokens=max_new_tokens,
-                temperature=0.7,  # ✅ 提高temperature增强创造性(中文)
+                temperature=0.55,  # ✅ 提高temperature增强创造性(中文)
                 do_sample=True,
-                top_p=0.8,
+                top_p=0.7,
                 top_k=20,
                 repetition_penalty=1.2
             )
@@ -516,7 +452,7 @@ def generate_chinese_caption(image_path: str, max_new_tokens: int = 160):
         return None
 
 
-def process_images(folder_path: str, use_4bit: bool = False, use_cpu: bool = False, progress=None):
+def process_images(folder_path: str,trigger_word: str,use_4bit: bool = False, use_cpu: bool = False, progress=None):
     """批量处理图片文件夹"""
     if not folder_path or not folder_path.strip():
         return "❌ 错误: 请输入有效的文件夹路径"
@@ -565,6 +501,8 @@ def process_images(folder_path: str, use_4bit: bool = False, use_cpu: bool = Fal
 
         if caption and len(caption) > 30:
             try:
+                if len(trigger_word.strip()) > 0:
+                    caption = trigger_word.strip() + "," + caption
                 with open(txt_path, 'w', encoding='utf-8') as f:
                     f.write(caption)
                 results["success"] += 1
@@ -674,6 +612,13 @@ def create_ui():
                             value=os.path.join(os.path.expanduser("~"), "ai-toolkit/datasets/demo")
                         )
                         with gr.Row():
+                             trigger_word= gr.Textbox(
+                                label="默认触发词",
+                                placeholder="不填写则会加入到标签中",
+                                value=""
+                            )
+
+                        with gr.Row():
                             process_btn = gr.Button("🚀 开始生成中文caption", variant="primary")
                             stop_btn = gr.Button("🛑 停止", variant="stop")
 
@@ -700,7 +645,7 @@ def create_ui():
 
         process_btn.click(
             fn=process_images,
-            inputs=[folder_input, use_4bit, use_cpu],
+            inputs=[folder_input,trigger_word, use_4bit, use_cpu],
             outputs=output,
             show_progress="full"
         )
@@ -748,6 +693,7 @@ def main():
     parser.add_argument('--cpu', action='store_true', help='强制CPU模式')
     parser.add_argument('--port', type=int, default=9527, help='Web UI端口')
     parser.add_argument('--folder', type=str, help='直接处理文件夹')
+    parser.add_argument('--trigger', type=str, help='默认触发词')
     args = parser.parse_args()
 
     global_use_4bit = args.__dict__['4bit']
@@ -768,7 +714,7 @@ def main():
 
     if args.folder:
         print(f"\n📁 直接处理文件夹: {args.folder}")
-        result = process_images(args.folder, use_4bit=args.__dict__['4bit'], use_cpu=args.cpu)
+        result = process_images(args.folder,args.trigger, use_4bit=args.__dict__['4bit'], use_cpu=args.cpu)
         print("\n" + result)
         return
 
