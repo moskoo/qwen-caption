@@ -597,8 +597,8 @@ def get_system_info():
 
 def create_ui():
     """创建Gradio UI界面 (兼容Gradio 3.x/4.x)"""
-    with gr.Blocks(title="XXG离线图片中文打标工具 Ver.2.2 (Qwen3-VL)") as demo:
-        gr.Markdown("# 🖼️ Qwen3-VL-8B-Instruct 离线图片中文打标工具")
+    with gr.Blocks(title="XXG离线图片中文打标工具 Ver.2.3 (Qwen3-VL)") as demo:
+        gr.Markdown("# 🖼️ Qwen3-VL 离线图片中文打标工具")
         gr.Markdown("### 100%中文caption生成 · 隐私安全 · 文生图训练专用")
         gr.Markdown("### By 西小瓜 / Wechat:priest-mos")
 
@@ -706,7 +706,7 @@ def main():
         print("💻 强制CPU模式")
 
     print("=" * 70)
-    print("🖼️  XXG离线图片中文打标工具 Ver.2.2 (Qwen3-VL)")
+    print("🖼️  XXG离线图片中文打标工具 Ver.2.3 (Qwen3-VL)")
     print("✅ 100%中文caption生成 | ✅ 本地模型化")
     print("=" * 70)
 

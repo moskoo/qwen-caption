@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 XXG通义千问离线图片中文打标工具-离线版(Qwen3-VL-8B-Instruct) Ver.2.2"
+echo "🚀 XXG通义千问离线图片中文打标工具-离线版(Qwen3-VL) Ver.2.3"
 echo "✅ 替换Qwen-vl-chat模型为Qwen3-VL | ✅ 文生图模型训练专用中文caption"
 echo "✅ CUDA 11.8/12.1/12.4/13.x 全版本原生支持 | ✅ bitsandbytes>=0.44.0"
 echo "✅ 100%中文caption | ✅ Qwen-Image、Seeddream等中文提示词LoRA训练专用"
