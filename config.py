@@ -9,7 +9,7 @@ class Config:
     @classmethod
     def get_caption_prompt(cls):
         """获取CAPTION_PROMPT"""
-        prompt_path = os.path.join(cls.BASE_DIR, 'prompt_cn_logo.txt')
+        prompt_path = os.path.join(cls.BASE_DIR, 'prompt_cn_font.txt')
         if not os.path.exists(prompt_path):
             raise FileNotFoundError(f"提示文件 {prompt_path} 不存在")
 

@@ -361,8 +361,8 @@ def _postprocess_caption(caption: str) -> str:
         caption = caption.split("assistant")[-1].strip()
 
     # 移除主观词
-    for word in SUBJECTIVE_WORDS:
-        caption = caption.replace(word, "")
+    #for word in SUBJECTIVE_WORDS:
+        #caption = caption.replace(word, "")
 
     # 标准化标点 (英文逗号分隔)
     caption = caption.replace("，", ",").replace("、", ",").replace("。", "").replace("；", ",")
